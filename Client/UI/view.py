@@ -1,9 +1,9 @@
 import tkinter as tk
-from Client.UI.LoginPage import *
-from Client.UI.UserPage import *
+from .LoginPage import *
+from .UserPage import *
 
 
-class View:
+class view:
     def __init__(self, master) -> None:
         self.master = master
 

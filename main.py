@@ -1,4 +1,4 @@
-from Client import client as clt
+import Client.controller as clt
 
 if __name__ == '__main__':
-    clt.Client()
+    clt.controller()
