@@ -1,4 +1,6 @@
-import Client.controller as clt
+from Client.client import *
+from Server.server import *
+
 
 if __name__ == '__main__':
-    clt.controller()
+    Server()

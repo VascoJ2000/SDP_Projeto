@@ -1,4 +1,3 @@
-import tkinter as tk
 from .LoginPage import *
 from .UserPage import *
 
