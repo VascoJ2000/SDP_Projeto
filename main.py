@@ -1,6 +1,7 @@
-from Client.client import *
-from Server.server import *
+from Client import clientApp
+from Server import serverApp
 
 
 if __name__ == '__main__':
-    Server()
+    svr = serverApp()
+    cl = clientApp()
