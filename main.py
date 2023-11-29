@@ -1,7 +1,7 @@
-from Client import clientApp
-from Server import serverApp
+from Client import client_app
+from Server import server_app
 
 
 if __name__ == '__main__':
-    svr = serverApp()
-    cl = clientApp()
+    svr = server_app()
+    cl = client_app()
