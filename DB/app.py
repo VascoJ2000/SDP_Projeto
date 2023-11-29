@@ -1,8 +1,9 @@
 import mysql.connector
 
 
-class Server:
-    def __init__(self):
+#Data Layer Server
+class DLS:
+    def __init__(self, mydb):
         #Conectar com a base de dados
         self.mydb = mysql.connector.connect(
             host="localhost",
@@ -14,7 +15,11 @@ class Server:
 
         self.mycursor = self.mydb.cursor()
 
-        self.mycursor.execute("SHOW DATABASES")
+    def add_user(self, name, password, email):
+        pass
 
-        for x in self.mycursor:
-            print(x)
+    def add_note(self, user, text):
+        pass
+
+    def change_note(self, note_id, new_text):
+        pass
