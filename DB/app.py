@@ -27,6 +27,9 @@ class DLS:
         self.execute_query(query, data)
 
     def change_note(self, note_id, new_text):
+        query = "UPDATE usernotes SET Note = %s WHERE NoteId = %s"
+        data = (new_text, note_id)
+        self.execute_query(query, data)
         pass
 
     def confirm_user(self, username, password):
