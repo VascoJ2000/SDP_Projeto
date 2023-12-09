@@ -16,34 +16,36 @@ class DLS:
 
         self.mycursor = self.mydb.cursor()
 
-    def add_user(self, username, password, email):
-        query = "INSERT INTO notlaruser (Username, Userpassword, Email) VALUES (%s, %s, %s)"
-        data = (username, password, email)
-        self.execute_query(query, data)
+    def add_entry(self, table, columns, data):
+        query = f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({', '.join(['%s']*len(data))})"
+        return self.execute_query(query, data)
 
-    def add_note(self, user_id, text):
-        query = "INSERT INTO usernotes (UserID, Note) VALUES (%s, %s)"
-        data = (user_id, text)
-        self.execute_query(query, data)
+    def change_elem(self, table, column, new_value, id_column, elem_id):
+        query = f"UPDATE {table} SET {column} = %s WHERE {id_column} = %s"
+        data = (new_value, elem_id)
+        return self.execute_query(query, data)
 
-    def change_note(self, note_id, new_text):
-        query = "UPDATE usernotes SET Note = %s WHERE NoteId = %s"
-        data = (new_text, note_id)
-        self.execute_query(query, data)
-        pass
+    def confirm_entry(self, table, column, value):
+        query = f"SELECT * FROM {table} WHERE {column} = %s"
+        data = (value,)
+        if self.mycursor.execute(query, data):
+            return self.mycursor.fetchone() is not None
+        return False
 
-    def confirm_user(self, username, password):
-        query = "SELECT EXISTS(SELECT 1 FROM notlaruser WHERE Username = %s)"
-        data = (username,)
-        self.mycursor.execute(query, data)
-        return self.mycursor.fetchone() is not None
-
-    def delete_note(self, note_id):
-        query = "DELETE FROM usernotes WHERE NoteId = %s"
-        data = (note_id,)
-        self.execute_query(query, data)
-        pass
+    def delete_entry(self, table, column, value):
+        query = f"DELETE FROM {table} WHERE {column} = %s"
+        data = (value,)
+        return self.execute_query(query, data)
 
     def execute_query(self, query, data):
-        self.mycursor.execute(query, data)
-        self.mydb.commit()
+        try:
+            self.mycursor.execute(query, data)
+            self.mydb.commit()
+        except:
+            return False
+        else:
+            return True
+
+    def disconnect(self):
+        self.mycursor.close()
+        self.mydb.close()
