@@ -18,27 +18,33 @@ class DLS:
 
     def add_entry(self, table, columns, data):
         query = f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({', '.join(['%s']*len(data))})"
-        self.execute_query(query, data)
+        return self.execute_query(query, data)
 
     def change_elem(self, table, column, new_value, id_column, elem_id):
         query = f"UPDATE {table} SET {column} = %s WHERE {id_column} = %s"
         data = (new_value, elem_id)
-        self.execute_query(query, data)
+        return self.execute_query(query, data)
 
-    def confirm_entry(self, table, row, value):
-        query = f"SELECT * FROM {table} WHERE {row} = %s"
+    def confirm_entry(self, table, column, value):
+        query = f"SELECT * FROM {table} WHERE {column} = %s"
         data = (value,)
-        self.mycursor.execute(query, data)
-        return self.mycursor.fetchone() is not None
+        if self.mycursor.execute(query, data):
+            return self.mycursor.fetchone() is not None
+        return False
 
-    def delete_entry(self, table, row, value):
-        query = f"DELETE FROM {table} WHERE {row} = %s"
+    def delete_entry(self, table, column, value):
+        query = f"DELETE FROM {table} WHERE {column} = %s"
         data = (value,)
-        self.execute_query(query, data)
+        return self.execute_query(query, data)
 
     def execute_query(self, query, data):
-        self.mycursor.execute(query, data)
-        self.mydb.commit()
+        try:
+            self.mycursor.execute(query, data)
+            self.mydb.commit()
+        except:
+            return False
+        else:
+            return True
 
     def disconnect(self):
         self.mycursor.close()
