@@ -20,9 +20,13 @@ class DLS:
         query = f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({', '.join(['%s']*len(data))})"
         return self.execute_query(query, data)
 
-    def change_elem(self, table, column, new_value, id_column, elem_id):
+    def get_entries(self, table, columns, data):
+        query = f"SELECT * FROM {table} WHERE ({', '.join(columns)}) IS ({', '.join(['%s'] * len(data))})"
+        pass
+
+    def update_entry(self, table, column, new_value, id_column, entry_id):
         query = f"UPDATE {table} SET {column} = %s WHERE {id_column} = %s"
-        data = (new_value, elem_id)
+        data = (new_value, entry_id)
         return self.execute_query(query, data)
 
     def confirm_entry(self, table, column, value):
@@ -41,7 +45,8 @@ class DLS:
         try:
             self.mycursor.execute(query, data)
             self.mydb.commit()
-        except:
+        except Exception as e:
+            print(e)
             return False
         else:
             return True
