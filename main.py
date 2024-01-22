@@ -1,7 +1,9 @@
 from Client import client_app
 from Server import server_app
-import DB.db
+import DB
 
 
 if __name__ == '__main__':
-    DB.run_server()
+    LoadBalancer = DB.run_load_balancer()
+    servers = []
+    servers.append(DB.run_server())

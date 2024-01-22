@@ -1,10 +1,10 @@
-import DB.db as db
+from DB.db import DLS
 from flask import request, jsonify
 
 
 class Controller:
     def __init__(self):
-        self.db = db.DLS("localhost", "3306", "root", "root", "notlar")
+        self.db = DLS("localhost", "3306", "root", "root", "notlar")
 
     # User methods
     def get_user_by_id(self, user_id):
