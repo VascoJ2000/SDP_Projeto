@@ -8,10 +8,10 @@ def run_server():
     new_server = DataLayerServer()
     try:
         server_port = get_port()
+        new_server.app.run(debug=True, port=server_port)
     except Exception as e:
         return 'Error: ' + str(e)
     else:
-        new_server.app.run(debug=True, port=server_port)
         return new_server
 
 
