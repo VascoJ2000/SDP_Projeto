@@ -1,4 +1,4 @@
 #Business Layer Server
-class BLS:
+class BusinessLayerServer:
     def __init__(self):
         pass
