@@ -1,7 +1,7 @@
 from Client import client_app
 from Server import server_app
-from DB import db_server_app
+import DB.db
 
 
 if __name__ == '__main__':
-    db_server_app()
+    DB.run_server()
