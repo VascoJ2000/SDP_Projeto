@@ -1,7 +1,5 @@
 import DB.db as db
-from flask import Flask, request, jsonify
-
-app = Flask(__name__)
+from flask import request, jsonify
 
 
 class Controller:
@@ -9,7 +7,6 @@ class Controller:
         self.db = db.DLS("localhost", "3306", "root", "root", "notlar")
 
     # User methods
-    @app.route('/user/id', methods=['GET'])
     def get_user_by_id(self, user_id):
         try:
             user = self.db.get_entries('notlaruser', ('ID',), (user_id,))
@@ -18,12 +15,11 @@ class Controller:
         else:
             return jsonify({
                 'User_id': user[0][0],
-                'Email': user[0][1],
-                'Username': user[0][2],
-                'Password': user[0][3]
+                'Email': user[0][3],
+                'Username': user[0][1],
+                'Password': user[0][2]
             }), 200
 
-    @app.route('/user/email', methods=['GET'])
     def get_user_by_email(self, email):
         try:
             user = self.db.get_entries('notlaruser', ('Email',), (email,))
@@ -40,7 +36,6 @@ class Controller:
             else:
                 return jsonify({'message': 'User not found'}), 404
 
-    @app.route('/user', methods=['POST'])
     def add_user(self):
         try:
             request_data = request.get_json()
@@ -55,7 +50,7 @@ class Controller:
                 return jsonify({'message': 'User added successfully'}), 200
             else:
                 return jsonify({'message': 'User was not added'}), 300
-    @app.route('/user/name', methods=['PUT'])
+
     def update_user_name(self):
         try:
             request_data = request.get_json()
@@ -69,7 +64,6 @@ class Controller:
             else:
                 return jsonify({'message': 'Username was not updated'}), 300
 
-    @app.route('/user/email', methods=['PUT'])
     def update_user_email(self):
         try:
             request_data = request.get_json()
@@ -83,7 +77,6 @@ class Controller:
             else:
                 return jsonify({'message': 'User email was not updated'}), 300
 
-    @app.route('/user/password', methods=['PUT'])
     def update_user_password(self):
         try:
             request_data = request.get_json()
@@ -97,7 +90,6 @@ class Controller:
             else:
                 return jsonify({'message': 'User password was not updated'}), 300
 
-    @app.route('/user/id', methods=['DELETE'])
     def delete_user_by_id(self):
         try:
             request_data = request.get_json()
@@ -112,7 +104,6 @@ class Controller:
                 return jsonify({'message': 'User was not deleted'}), 300
 
     # Note methods
-    @app.route('/note/user_id', methods=['GET'])
     def get_note_by_user_id(self, user_id):
         try:
             data = self.db.get_entries('usernotes', 'UserID', user_id)
@@ -124,7 +115,6 @@ class Controller:
             else:
                 return jsonify({'message': 'No notes were found'}), 404
 
-    @app.route('/note/id', methods=['GET'])
     def get_note_by_id(self, note_id):
         try:
             data = self.db.get_entries('usernotes', 'ID', note_id)
@@ -140,7 +130,6 @@ class Controller:
             else:
                 return jsonify({'message': 'No notes were found'}), 404
 
-    @app.route('/note', methods=['POST'])
     def add_note(self):
         try:
             request_data = request.get_json()
@@ -156,7 +145,6 @@ class Controller:
             else:
                 return jsonify({'message': 'New Note was not added'}), 300
 
-    @app.route('/note', methods=['PUT'])
     def update_note_content(self):
         try:
             request_data = request.get_json()
@@ -171,7 +159,6 @@ class Controller:
             else:
                 return jsonify({'message': 'Note content was not updated'}), 300
 
-    @app.route('/note/title', methods=['PUT'])
     def update_note_title(self):
         try:
             request_data = request.get_json()
@@ -186,7 +173,6 @@ class Controller:
             else:
                 return jsonify({'message': 'Note Title was not updated'}), 300
 
-    @app.route('/note', methods=['DELETE'])
     def delete_note_by_id(self):
         try:
             request_data = request.get_json()

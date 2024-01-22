@@ -1,10 +1,8 @@
-import DB.controller
-
-
-DBS = controller.Controller()
+import DB.server
 
 
 def run_server():
-    ds = DBS.get_user_by_email('30005819@students.ual.pt')
-    print(ds)
+    app = server.DataLayerServer()
+
+    app.app.run(debug=True, port=8888)
 
