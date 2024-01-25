@@ -1,4 +1,4 @@
 #Cliente Notlar Application
-class CNA:
+class Client:
     def __init__(self):
         pass

@@ -1,10 +1,7 @@
-import tkinter as tk
-import Client.view
-
-UI = view.view
+from Client.app import Client
 
 
-def client_app():
-    root = tk.Tk()
-    ui = UI(root)
-    root.mainloop()
+def run_client():
+    client = Client()
+    return client
+

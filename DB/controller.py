@@ -68,7 +68,8 @@ class Controller:
         try:
             request_data = request.get_json()
             email = request_data.get('Email')
-            data = self.db.update_entry('notlaruser', 'Email', email)
+            user_id = request_data.get('User_id')
+            data = self.db.update_entry('notlaruser', 'Email', email, 'UserID', user_id)
         except Exception as e:
             return jsonify('Error: ' + str(e)), 500
         else:
@@ -81,7 +82,8 @@ class Controller:
         try:
             request_data = request.get_json()
             password = request_data.get('Password')
-            data = self.db.update_entry('notlaruser', 'UserPassword', password)
+            user_id = request_data.get('User_id')
+            data = self.db.update_entry('notlaruser', 'UserPassword', password, 'UserID', user_id)
         except Exception as e:
             return jsonify('Error: ' + str(e)), 500
         else:
