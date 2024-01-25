@@ -1,0 +1,48 @@
+from abc import ABC, abstractmethod
+from flask import Flask
+from dotenv import load_dotenv
+import socket
+import random
+import requests
+
+load_dotenv()
+
+
+class Server(ABC):
+    def __init__(self):
+        self.app = Flask(__name__)
+        self.setup_routes()
+        self.port = None
+        self.run_server()
+
+    @abstractmethod
+    def setup_routes(self):
+        pass
+
+    def connect_to_balancer(self, ip, port):
+        response = requests.post(f'http://{ip}:{port}')
+        if response.status_code == 200:
+            print(f'Server is running on port {self.port}')
+        else:
+            raise Exception(f'Server could not be added to load balancer list')
+
+    def run_server(self):
+        try:
+            self.port = get_port()
+            self.app.run(port=self.port)
+        except Exception as e:
+            print('Error: ' + str(e))
+
+
+def get_port(start_port=6000, max_attempts=12):
+    for i in range(max_attempts):
+        port = random.randint(start_port, start_port + 1999)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            sock.bind(('localhost', port))
+            return port
+        except OSError:
+            pass
+        finally:
+            sock.close()
+    raise Exception(f"Unable to bind port in {max_attempts} attempts")
