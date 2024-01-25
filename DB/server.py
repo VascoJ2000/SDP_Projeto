@@ -1,12 +1,13 @@
-from flask import Flask
 from DB.controller import Controller
+from Abstract.server import Server
+import os
 
 
-class DataLayerServer:
+class DataLayerServer(Server):
     def __init__(self):
-        self.app = Flask(__name__)
         self.controller = Controller()
-        self.setup_routes()
+        super().__init__()
+        self.connect_to_balancer('localhost', os.getenv('DB_LOAD_BALANCER_IP'))
 
     def setup_routes(self):
         # User Routes
@@ -18,7 +19,7 @@ class DataLayerServer:
         self.app.route('/user/password', methods=['PUT'])(self.controller.update_user_password)
         self.app.route('/user/id', methods=['DELETE'])(self.controller.delete_user_by_id)
 
-        #Note Routes
+        # Note Routes
         self.app.route('/note/user_id/<user_id>', methods=['GET'])(self.controller.get_note_by_user_id)
         self.app.route('/note/id/<note_id>', methods=['GET'])(self.controller.get_note_by_id)
         self.app.route('/note', methods=['POST'])(self.controller.add_note)

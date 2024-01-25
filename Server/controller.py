@@ -1,9 +1,8 @@
-import os
-
 from Server.client import DataLayerClient
-from flask import request, jsonify, Flask
+from flask import request, jsonify
 import jwt
 import bcrypt
+import os
 
 
 class Controller:

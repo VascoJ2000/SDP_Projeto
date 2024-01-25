@@ -1,13 +1,15 @@
-from flask import Flask
 from Server.controller import Controller
+from Abstract.server import Server
+import os
 
 
 #Business Layer Server
-class BusinessLayerServer:
+class BusinessLayerServer(Server):
     def __init__(self):
-        self.app = Flask(__name__)
         self.controller = Controller()
-        self.setup_routes()
+        super().__init__()
+        self.connect_to_balancer('localhost', os.getenv('BL_LOAD_BALANCER_IP'))
+        self.controller.client.connect('localhost', os.getenv('DB_LOAD_BALANCER_IP'))
 
     def setup_routes(self):
         # User Routes
