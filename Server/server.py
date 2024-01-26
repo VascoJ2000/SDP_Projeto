@@ -1,5 +1,5 @@
 from Server.controller import Controller
-from Abstract.server import Server
+from Shared.Abstract.server import Server
 import os
 
 

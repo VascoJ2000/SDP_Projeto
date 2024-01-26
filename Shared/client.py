@@ -2,7 +2,7 @@ import requests
 import time
 
 
-class DataLayerClient:
+class Client:
     def __init__(self):
         self.server_url = None
 
@@ -53,4 +53,4 @@ class DataLayerClient:
                 time.sleep(2)
             else:
                 raise Exception('Error: ' + str(response.json()['error']))
-        raise Exception('Business Layer Cliente cannot find a available server')
+        raise Exception('Cliente cannot find a available server')

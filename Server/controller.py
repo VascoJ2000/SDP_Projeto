@@ -1,4 +1,4 @@
-from Server.client import DataLayerClient
+from Shared.client import Client
 from flask import request, jsonify
 import jwt
 import bcrypt
@@ -7,7 +7,7 @@ import os
 
 class Controller:
     def __init__(self):
-        self.client = DataLayerClient()
+        self.client = Client()
 
     def get_user(self):
         data = request.get_json()
