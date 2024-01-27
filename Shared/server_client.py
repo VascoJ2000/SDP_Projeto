@@ -16,33 +16,37 @@ class Client:
             response = requests.get(url)
 
         if response.status_code == 200:
-            return response.json()
+            return response
         else:
-            raise Exception('Error: ' + str(response.json()['error']))
+            raise Exception('Error: ' + str(response.json()['Error']))
 
     def post_request(self, route, data, token=None):
         url = self.server_url + route
         if token:
-            response = requests.post(url, headers={'Authorization': f'Bearer {token}'}, json=data)
+            headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json; charset=utf-8'}
+            response = requests.post(url, headers=headers, json=data)
         else:
-            response = requests.post(url, json=data)
+            headers = {'Content-Type': 'application/json; charset=utf-8'}
+            response = requests.post(url, headers=headers, json=data)
 
         if response.status_code == 200:
-            return response.json()
+            return response
         else:
-            raise Exception('Error: ' + str(response.json()['error']))
+            raise Exception('Error: ' + str(response.json()['Error']))
 
     def update_request(self, route, data, token=None):
         url = self.server_url + route
         if token:
-            response = requests.put(url, headers={'Authorization': f'Bearer {token}'}, json=data)
+            headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json; charset=utf-8'}
+            response = requests.put(url, headers=headers, json=data)
         else:
-            response = requests.put(url, json=data)
+            headers = {'Content-Type': 'application/json; charset=utf-8'}
+            response = requests.put(url, headers=headers, json=data)
 
         if response.status_code == 200:
-            return response.status_code
+            return response
         else:
-            raise Exception('Error: ' + str(response.json()['error']))
+            raise Exception('Error: ' + str(response.json()['Error']))
 
     def delete_request(self, route, search_id, token=None):
         url = self.server_url + f"{route}/{search_id}"
@@ -52,17 +56,19 @@ class Client:
             response = requests.delete(url)
 
         if response.status_code == 200:
-            return response.status_code
+            return response
         else:
-            raise Exception('Error: ' + str(response.json()['error']))
+            raise Exception('Error: ' + str(response.json()['Error']))
 
     def connect(self, host, port, max_attempts=12):
         for i in range(max_attempts):
             response = requests.get(f'http://{host}:{port}/')
             if response.status_code == 200:
                 data = response.json()
-                self.server_url = 'http:' + data['Server_ip'] + ':' + str(data['Server_port'])
-                return print(f'Cliente connected to load balancer no port {port}')
+                server_ip = data['Server_ip']
+                server_port = str(data['Server_port'])
+                self.server_url = f'http://{server_ip}:{server_port}/'
+                return print(f'Cliente connected to server on port {server_port}')
             elif response.status_code == 425:
                 time.sleep(2)
             else:

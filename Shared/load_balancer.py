@@ -9,12 +9,12 @@ class LoadBalancer:
         self.setup_routes()
         self.run_app(port)
 
-    def add_server(self):
+    def add_server(self, port):
         try:
             server_ip = request.remote_addr
-            server_port = request.environ.get('REMOTE_PORT')
-            print("Server IP: " + server_ip + ", Server Port: " + str(server_port))
+            server_port = port
             self.servers.append((server_ip, server_port))
+            print(f"Server IP: {server_ip}, Server Port: {str(server_port)}")
         except Exception as e:
             return jsonify({'error': str(e)}), 500
         else:
@@ -39,7 +39,7 @@ class LoadBalancer:
 
     def setup_routes(self):
         self.app.route('/', methods=['GET'])(self.get_server)
-        self.app.route('/add', methods=['GET'])(self.add_server)
+        self.app.route('/<port>', methods=['GET'])(self.add_server)
 
     def run_app(self, port):
         self.app.run(port=port)
