@@ -18,7 +18,7 @@ class DataLayerServer(Server):
         self.app.route('/user', methods=['DELETE'])(self.controller.delete_user)
 
         # Note Routes
-        self.app.route('/note/<user_id>&<note_id>', methods=['GET'])(self.controller.get_note)
+        self.app.route('/note/<user_id>&<note_id>', methods=['GET'])(self.controller.get_notes)
         self.app.route('/note', methods=['POST'])(self.controller.add_note)
         self.app.route('/note', methods=['PUT'])(self.controller.update_note)
         self.app.route('/note', methods=['DELETE'])(self.controller.delete_note)

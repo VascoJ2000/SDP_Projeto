@@ -24,7 +24,7 @@ class BaseController(ABC):
 
     # Note methods
     @abstractmethod
-    def get_note(self, user_id, note_id):
+    def get_notes(self, user_id, note_id=None):
         pass
 
     @abstractmethod

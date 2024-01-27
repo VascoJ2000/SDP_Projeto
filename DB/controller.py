@@ -11,31 +11,35 @@ class Controller(BaseController):
     # User methods
     def get_user(self, user_id, email):
         try:
-            if user_id:
+            if user_id != 'None':
                 user = self.db.get_entries('notlaruser', ('ID',), (user_id,))
-            elif email:
+            elif email != 'None':
                 user = self.db.get_entries('notlaruser', ('Email',), (email,))
             else:
                 raise Exception('No User data found in request')
+
+            if len(user) == 0:
+                raise Exception('No such user found')
+            data = {
+                "User_id": user[0][0],
+                "Email": user[0][3],
+                "Username": user[0][1],
+                "Password": user[0][2]
+            }
         except Exception as e:
-            return jsonify('Error: ' + str(e)), 500
+            return jsonify({'Error':  str(e)}), 500
         else:
-            return jsonify({
-                'User_id': user[0][0],
-                'Email': user[0][3],
-                'Username': user[0][1],
-                'Password': user[0][2]
-            }), 200
+            return jsonify(data), 200
 
     def add_user(self):
         try:
             request_data = request.get_json()
-            username = request_data.get('Username')
-            password = request_data.get('Password')
-            email = request_data.get('Email')
+            username = request_data['Username']
+            password = request_data['Password']
+            email = request_data['Email']
             data = self.db.add_entry('notlaruser', ("Username", "UserPassword", "Email"), (username, password, email))
         except Exception as e:
-            return jsonify('Error: ' + str(e)), 500
+            return jsonify({'Error':  str(e)}), 500
         else:
             if data:
                 return jsonify({'message': 'User added successfully'}), 200
@@ -45,20 +49,14 @@ class Controller(BaseController):
     def update_user(self):
         try:
             request_data = request.get_json()
-            user_id = request_data.get('User_id')
-            if request_data['Username']:
-                username = request_data.get('Username')
-                data = self.db.update_entry('notlaruser', 'Username', username, 'UserID', user_id)
-            elif request_data['Email']:
-                email = request_data.get('Email')
-                data = self.db.update_entry('notlaruser', 'Email', email, 'UserID', user_id)
-            elif request_data['Password']:
-                password = request_data.get('Password')
-                data = self.db.update_entry('notlaruser', 'UserPassword', password, 'UserID', user_id)
-            else:
-                raise Exception('No data found in request')
+            user_id = request_data['User_id']
+
+            username = request_data['Username']
+            email = request_data['Email']
+            password = request_data['Password']
+            data = self.db.update_entry('notlaruser', ('Username', 'Email', 'UserPassword'), (username, email, password), 'ID', user_id)
         except Exception as e:
-            return jsonify('Error: ' + str(e)), 500
+            return jsonify({'Error':  str(e)}), 500
         else:
             if data:
                 return jsonify({'message': 'User was updated successfully'}), 200
@@ -70,7 +68,7 @@ class Controller(BaseController):
             user_id = request_data.get('User_id')
             data = self.db.delete_entry('notlaruser', 'ID', user_id)
         except Exception as e:
-            return jsonify('Error: ' + str(e)), 500
+            return jsonify({'Error':  str(e)}), 500
         else:
             if data:
                 return jsonify({'message': 'User deleted successfully'}), 200
@@ -78,7 +76,7 @@ class Controller(BaseController):
                 return jsonify({'message': 'User was not deleted'}), 300
 
     # Note methods
-    def get_note(self, user_id, note_id):
+    def get_notes(self, user_id, note_id=None):
         try:
             if user_id:
                 data = self.db.get_entries('usernotes', 'UserID', user_id)
@@ -87,7 +85,7 @@ class Controller(BaseController):
             else:
                 raise Exception('No data found in request')
         except Exception as e:
-            return jsonify('Error: ' + str(e)), 500
+            return jsonify({'Error':  str(e)}), 500
         else:
             if data:
                 return jsonify({'Notes': data}), 200
@@ -102,7 +100,7 @@ class Controller(BaseController):
             note = request_data.get('Note')
             data = self.db.add_entry('usernotes', ("UserID", 'Title', "Note"), (user_id, title, note))
         except Exception as e:
-            return jsonify('Error: ' + str(e)), 500
+            return jsonify({'Error':  str(e)}), 500
         else:
             if data:
                 return jsonify({'message': 'New Note successfully added'}), 200
@@ -113,16 +111,11 @@ class Controller(BaseController):
         try:
             request_data = request.get_json()
             note_id = request_data.get('Note_id')
-            if request_data['Content']:
-                new_note = request_data.get('Note')
-                data = self.db.update_entry('usernotes', 'note', new_note, 'NoteID', note_id)
-            elif request_data['Title']:
-                new_title = request_data.get('Title')
-                data = self.db.update_entry('usernotes', 'note', new_title, 'NoteID', note_id)
-            else:
-                raise Exception('No data found in request')
+            new_note = request_data.get('Note')
+            new_title = request_data.get('Title')
+            data = self.db.update_entry('usernotes', ('Title', 'Note'), (new_title, new_note), 'NoteID', note_id)
         except Exception as e:
-            return jsonify('Error: ' + str(e)), 500
+            return jsonify({'Error':  str(e)}), 500
         else:
             if data:
                 return jsonify({'message': 'Note content successfully updated'}), 200
@@ -135,7 +128,7 @@ class Controller(BaseController):
             note_id = request_data.get('Note_id')
             data = self.db.delete_entry('usernotes', 'NoteID', note_id)
         except Exception as e:
-            return jsonify('Error: ' + str(e)), 500
+            return jsonify({'Error':  str(e)}), 500
         else:
             if data:
                 return jsonify({'message': 'Note successfully deleted'}), 200

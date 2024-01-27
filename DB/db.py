@@ -31,9 +31,9 @@ class DLS:
         self.mydb.commit()
         return result
 
-    def update_entry(self, table, column, new_value, id_column, entry_id):
-        query = f"UPDATE {table} SET {column} = %s WHERE {id_column} = %s"
-        data = (new_value, entry_id)
+    def update_entry(self, table, columns, new_values, id_column, entry_id):
+        query = f"UPDATE {table} SET {' = %s, '.join(columns)} = %s WHERE {id_column} = %s"
+        data = new_values + (entry_id,)
 
         self.mycursor.execute(query, data)
         self.mydb.commit()

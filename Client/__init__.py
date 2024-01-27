@@ -1,4 +1,6 @@
 from Client.app import Client
 
 
-client = Client
+def run():
+    client = Client()
+    client.run_client()

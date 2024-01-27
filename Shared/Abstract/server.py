@@ -21,7 +21,7 @@ class Server(ABC):
 
     def connect_to_balancer(self, ip, port, max_attempts=12):
         for i in range(max_attempts):
-            response = requests.get(f'http://{ip}:{port}/add')
+            response = requests.get(f'http://{ip}:{port}/{self.port}')
             if response.status_code == 200:
                 return print(f'Server was added to load balancer')
             else:
