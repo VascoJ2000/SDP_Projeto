@@ -11,9 +11,9 @@ class LoadBalancer:
 
     def add_server(self):
         try:
-            request_data = request.get_json()
-            server_ip = request_data['server_ip']
-            server_port = request_data['server_port']
+            server_ip = request.remote_addr
+            server_port = request.environ.get('REMOTE_PORT')
+            print("Server IP: " + server_ip + ", Server Port: " + str(server_port))
             self.servers.append((server_ip, server_port))
         except Exception as e:
             return jsonify({'error': str(e)}), 500
@@ -32,13 +32,14 @@ class LoadBalancer:
             return jsonify({'Server_ip': server[0], 'Server_port': server[1]}), 200
 
     def hash_ip(self, ip_address):
-        hashed_ip = int(hashlib.md5(ip_address.encode()).hexdigest())
-        server_index = hashed_ip % len(self.servers)
+        hashed_ip = hashlib.md5(ip_address.encode()).hexdigest()
+        hashed_int = int(hashed_ip, 16)
+        server_index = hashed_int % len(self.servers)
         return self.servers[server_index]
 
     def setup_routes(self):
         self.app.route('/', methods=['GET'])(self.get_server)
-        self.app.route('/', methods=['POST'])(self.add_server)
+        self.app.route('/add', methods=['GET'])(self.add_server)
 
     def run_app(self, port):
         self.app.run(port=port)

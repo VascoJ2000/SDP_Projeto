@@ -2,4 +2,4 @@ import threads
 
 
 if __name__ == '__main__':
-    threads.run_thread(3, 2)
+    thread_list = threads.run_thread(1, 1)
