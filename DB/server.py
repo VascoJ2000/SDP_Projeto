@@ -1,13 +1,14 @@
-from DB.controller import BaseController
+from DB.controller import Controller
 from Shared.Abstract.server import Server
 import os
 
 
 class DataLayerServer(Server):
     def __init__(self):
-        self.controller = BaseController()
+        self.controller = Controller()
         super().__init__()
         self.connect_to_balancer('localhost', os.getenv('DB_LOAD_BALANCER_IP'))
+        self.run_server()
 
     def setup_routes(self):
         # User Routes

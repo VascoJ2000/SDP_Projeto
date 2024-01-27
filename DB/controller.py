@@ -1,5 +1,5 @@
 from DB.db import DLS
-from Shared.Abstract.base_controller import BaseController
+from Shared.Abstract import BaseController
 from flask import request, jsonify
 
 
@@ -90,7 +90,7 @@ class Controller(BaseController):
             return jsonify('Error: ' + str(e)), 500
         else:
             if data:
-                return jsonify({'notes': data}), 200
+                return jsonify({'Notes': data}), 200
             else:
                 return jsonify({'message': 'No notes were found'}), 404
 

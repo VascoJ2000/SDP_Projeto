@@ -58,13 +58,13 @@ class Client:
 
     def connect(self, host, port, max_attempts=12):
         for i in range(max_attempts):
-            response = requests.get(f'http://{host}:{port}')
-            data = response.json()
+            response = requests.get(f'http://{host}:{port}/')
             if response.status_code == 200:
-                self.server_url = 'http:' + data['server_ip'] + ':' + data['server_port']
-                print(f'Cliente connected to load balancer no port {port}')
+                data = response.json()
+                self.server_url = 'http:' + data['Server_ip'] + ':' + str(data['Server_port'])
+                return print(f'Cliente connected to load balancer no port {port}')
             elif response.status_code == 425:
                 time.sleep(2)
             else:
-                raise Exception('Error: ' + str(response.json()['error']))
+                raise Exception(str(response.json()['error']))
         raise Exception('Cliente cannot find a available server')

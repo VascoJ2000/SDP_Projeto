@@ -10,6 +10,7 @@ class BusinessLayerServer(Server):
         super().__init__()
         self.connect_to_balancer('localhost', os.getenv('BL_LOAD_BALANCER_IP'))
         self.controller.client.connect('localhost', os.getenv('DB_LOAD_BALANCER_IP'))
+        self.run_server()
 
     def setup_routes(self):
         # User Routes

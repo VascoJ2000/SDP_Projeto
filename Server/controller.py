@@ -1,4 +1,4 @@
-from Shared.client import Client
+from Shared import Client
 from Shared.Abstract import BaseController, AuthController
 from flask import request, jsonify
 import jwt

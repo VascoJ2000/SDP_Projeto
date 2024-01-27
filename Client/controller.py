@@ -1,6 +1,6 @@
-from Shared.client import Client
+from Shared import Client
 from Shared.Abstract import BaseController, AuthController
-import json
+
 
 class Controller(BaseController, AuthController):
     def __init__(self):
@@ -25,9 +25,9 @@ class Controller(BaseController, AuthController):
             res = self.client.post_request('/user', data)
             user = res['Username']
         except Exception as e:
-            return str(e)
+            return False, str(e)
         else:
-            return f'User {user} added successfully.'
+            return True, f'User {user} added successfully.'
 
     def update_user(self, username=None, email=None, password=None):
         try:
@@ -43,32 +43,76 @@ class Controller(BaseController, AuthController):
             res = self.client.update_request('/user', data, token=self.token)
             user = res['Username']
         except Exception as e:
-            return str(e)
+            return False, str(e)
         else:
-            return f'User {user} info updated successfully.'
+            return True, f'User {user} info updated successfully.'
 
     def delete_user(self):
         try:
             self.verify_token()
-            res = self.client.delete_request('/user', self.user_id, token=self.token)
+            data = {'User_id': self.user_id}
+            res = self.client.delete_request('/user', data, token=self.token)
             user = res['Username']
         except Exception as e:
-            return str(e)
+            return False, str(e)
         else:
-            return f'User {user} was deleted successfully.'
+            return True, f'User {user} was deleted successfully.'
 
     # Note methods
     def get_note(self, user_id, note_id):
-        pass
+        try:
+            self.verify_token()
+            res = self.client.get_request('/note', user_id, note_id, token=self.token)
+            data = res['Notes']
+        except Exception as e:
+            return False, str(e)
+        else:
+            if user_id is None:
+                return True, data[0][2], data[0][3]
+            else:
+                notes = ''
+                for i in data:
+                    notes += 'Note_id: ' + i[0] + 'Title: ' + data[2] + '\n'
 
-    def add_note(self):
-        pass
+                return True, notes
 
-    def update_note(self):
-        pass
+    def add_note(self, note_id=None, title=None, content=None):
+        try:
+            self.verify_token()
+            data = {'Note_id': note_id, 'Title': title, 'Content': content}
+            res = self.client.post_request('/note', data, token=self.token)
+            note = res['Title']
+        except Exception as e:
+            return False, str(e)
+        else:
+            return True, f'Note {note} was added successfully.'
 
-    def delete_note(self):
-        pass
+    def update_note(self, note_id=None, title=None, content=None):
+        try:
+            self.verify_token()
+            if title:
+                data = {'Note_id': note_id, 'title': title}
+            elif content:
+                data = {'Note_id': note_id, 'Content': content}
+            else:
+                raise Exception('No Note data was provided')
+            res = self.client.update_request('/note', data, token=self.token)
+            note = res['Title']
+        except Exception as e:
+            return False, str(e)
+        else:
+            return True, f'Note {note} was updated successfully.'
+
+    def delete_note(self, note_id=None):
+        try:
+            self.verify_token()
+            data = {'Note_id': note_id}
+            res = self.client.delete_request('/note', data, token=self.token)
+            note = res['Title']
+        except Exception as e:
+            return False, str(e)
+        else:
+            return True, f'Note {note} was deleted successfully.'
 
     def login(self, email: str, password: str):
         try:
@@ -91,6 +135,7 @@ class Controller(BaseController, AuthController):
 
     def logout(self):
         self.token = None
+        self.user_id = None
 
     def verify_token(self):
         if self.token is None:
