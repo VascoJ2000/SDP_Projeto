@@ -78,17 +78,20 @@ class Controller(BaseController):
     # Note methods
     def get_notes(self, user_id, note_id=None):
         try:
-            if user_id:
-                data = self.db.get_entries('usernotes', 'UserID', user_id)
-            elif note_id:
-                data = self.db.get_entries('usernotes', 'ID', note_id)
+            if user_id != 'None':
+                data = self.db.get_entries('usernotes', ('UserID',), (user_id,))
+            elif note_id != 'None':
+                data = self.db.get_entries('usernotes', ('ID',), (note_id,))
             else:
                 raise Exception('No data found in request')
+            notes = []
+            for entry in data:
+                notes.append({'Note_id': entry[0], 'User_id': entry[1], 'Title': entry[2], 'Note': entry[3]})
         except Exception as e:
             return jsonify({'Error':  str(e)}), 500
         else:
-            if data:
-                return jsonify({'Notes': data}), 200
+            if notes:
+                return jsonify({'Notes': notes}), 200
             else:
                 return jsonify({'message': 'No notes were found'}), 404
 
@@ -113,7 +116,7 @@ class Controller(BaseController):
             note_id = request_data.get('Note_id')
             new_note = request_data.get('Note')
             new_title = request_data.get('Title')
-            data = self.db.update_entry('usernotes', ('Title', 'Note'), (new_title, new_note), 'NoteID', note_id)
+            data = self.db.update_entry('usernotes', ('Title', 'Note'), (new_title, new_note), 'ID', note_id)
         except Exception as e:
             return jsonify({'Error':  str(e)}), 500
         else:
@@ -126,7 +129,7 @@ class Controller(BaseController):
         try:
             request_data = request.get_json()
             note_id = request_data.get('Note_id')
-            data = self.db.delete_entry('usernotes', 'NoteID', note_id)
+            data = self.db.delete_entry('usernotes', 'ID', note_id)
         except Exception as e:
             return jsonify({'Error':  str(e)}), 500
         else:

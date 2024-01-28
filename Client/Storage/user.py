@@ -31,7 +31,7 @@ class User:
         self.__token = token
 
     def login(self):
-        user_data = [{'user_id': self.__user_id, 'Username': self.__name, 'Email': self.__email, 'Token': self.__token}]
+        user_data = [{'User_id': self.__user_id, 'Username': self.__name, 'Email': self.__email, 'Token': self.__token}]
 
         with open(self.__recovery_file, 'w') as f:
             json.dump(user_data, f, indent=2)

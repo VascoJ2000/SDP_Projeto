@@ -17,7 +17,7 @@ class Controller(BaseController, AuthController):
             verify_token(request.headers)
             res = self.client.get_request('/user', user_id, email)
         except Exception as e:
-            return jsonify({'error': str(e)}), 406
+            return jsonify({'Error': str(e)}), 406
         else:
             return res.json(), res.status_code
 
@@ -35,7 +35,7 @@ class Controller(BaseController, AuthController):
             }
             res = self.client.post_request('/user', data)
         except Exception as e:
-            return jsonify(str(e)), 406
+            return jsonify({'Error': str(e)}), 406
         else:
             return res.json(), res.status_code
 
@@ -56,7 +56,7 @@ class Controller(BaseController, AuthController):
             }
             res = self.client.update_request('/user', data)
         except Exception as e:
-            return jsonify(str(e)), 406
+            return jsonify({'Error': str(e)}), 406
         else:
             return res.json(), res.status_code
 
@@ -66,7 +66,7 @@ class Controller(BaseController, AuthController):
             data = request.get_json()
             res = self.client.delete_request('/user', data)
         except Exception as e:
-            return jsonify(str(e)), 406
+            return jsonify({'Error': str(e)}), 406
         else:
             return res.json(), res.status_code
 
@@ -76,7 +76,7 @@ class Controller(BaseController, AuthController):
             verify_token(request.headers)
             res = self.client.get_request('/note', user_id, note_id)
         except Exception as e:
-            return jsonify({'error': str(e)}), 406
+            return jsonify({'Error': str(e)}), 406
         else:
             return res.json(), res.status_code
 
@@ -86,7 +86,7 @@ class Controller(BaseController, AuthController):
             data = request.get_json()
             res = self.client.post_request('/note', data)
         except Exception as e:
-            return jsonify(str(e)), 406
+            return jsonify({'Error': str(e)}), 406
         else:
             return res.json(), res.status_code
 
@@ -94,9 +94,9 @@ class Controller(BaseController, AuthController):
         try:
             verify_token(request.headers)
             data = request.get_json()
-            res = self.client.update_request('/notes', data)
+            res = self.client.update_request('/note', data)
         except Exception as e:
-            return jsonify(str(e)), 406
+            return jsonify({'Error': str(e)}), 406
         else:
             return res.json(), res.status_code
 
@@ -106,7 +106,7 @@ class Controller(BaseController, AuthController):
             data = request.get_json()
             res = self.client.delete_request('/note', data)
         except Exception as e:
-            return jsonify(str(e)), 406
+            return jsonify({'Error': str(e)}), 406
         else:
             return res.json(), res.status_code
 
@@ -120,15 +120,15 @@ class Controller(BaseController, AuthController):
             password_verify(password, hashed_password)
             res = generate_token(data)
         except Exception as e:
-            return jsonify({"error": str(e)}), 400
+            return jsonify({'Error': str(e)}), 400
         else:
-            return jsonify({'token': res, 'User_id': data['User_id']}), 200
+            return jsonify({'token': res, 'User_id': data['User_id'], 'Email': data['Email'], 'Username': data['Username']}), 200
 
     def token(self):
         try:
             verify_token(request.headers)
         except Exception as e:
-            return jsonify({"message": str(e)}), 301
+            return jsonify({'Error': str(e)}), 301
         else:
             return jsonify({"message": "Token is valid"}), 200
 
