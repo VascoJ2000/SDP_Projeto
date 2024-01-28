@@ -48,12 +48,14 @@ class Client:
         else:
             raise Exception('Error: ' + str(response.json()['Error']))
 
-    def delete_request(self, route, search_id, token=None):
-        url = self.server_url + f"{route}/{search_id}"
+    def delete_request(self, route, data, token=None):
+        url = self.server_url + f"{route}"
         if token:
-            response = requests.delete(url, headers={'Authorization': f'Bearer {token}'})
+            headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json; charset=utf-8'}
+            response = requests.delete(url, headers=headers, json=data)
         else:
-            response = requests.delete(url)
+            headers = {'Content-Type': 'application/json; charset=utf-8'}
+            response = requests.delete(url, headers=headers, json=data)
 
         if response.status_code == 200:
             return response

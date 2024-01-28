@@ -16,11 +16,12 @@ class Controller(BaseController, AuthController):
         try:
             self.verify_token()
             res = self.client.get_request('/user', user_id, email)
+            data = res.json()
+            user_id, email, username = data['User_id'], data['Email'], data['Username']
         except Exception as e:
             return False, str(e)
         else:
-            user_id, email, username = res.json()['User_id'], res.json()['Email'], res.json()['Username']
-            return True, f'User_id: {user_id},  Email: {email}, Username: {username}'
+            return True, data
 
     def add_user(self, username=None, email=None, password=None):
         try:
@@ -29,7 +30,6 @@ class Controller(BaseController, AuthController):
                 "Email": email,
                 "Password": password
             }
-            print(type(data))
             self.client.post_request('/user', data)
         except Exception as e:
             return False, str(e)
@@ -39,18 +39,16 @@ class Controller(BaseController, AuthController):
     def update_user(self, username=None, email=None, password=None):
         try:
             self.verify_token()
-            if username:
-                data = {'Username': username}
-            elif email:
-                data = {'Email': email}
-            elif password:
-                data = {'Password': password}
+            if username and email and password:
+                data = {'User_id': self.user.get_user_id(), 'Username': username, 'Email': email, 'Password': password}
             else:
-                return False, 'No User data was provided'
+                return False, 'Not enough user data was provided'
             self.client.update_request('/user', data, token=self.user.get_token())
         except Exception as e:
             return False, str(e)
         else:
+            self.logout()
+            self.login(email, password)
             return True, f'User info updated successfully.'
 
     def delete_user(self):
@@ -68,11 +66,10 @@ class Controller(BaseController, AuthController):
         try:
             self.verify_token()
             res = self.client.get_request('/note', user_id, note_id, token=self.user.get_token())
-            data = res['Notes']
+            data = res.json()
         except Exception as e:
-            return False, str(e)
+            return False, {'Error': str(e)}
         else:
-
             return True, data
 
     def add_note(self, user_id=None, title=None, content=None):
@@ -89,7 +86,7 @@ class Controller(BaseController, AuthController):
         try:
             self.verify_token()
             if title and content:
-                data = {'Note_id': note_id, 'title': title, 'Note': content}
+                data = {'Note_id': note_id, 'Title': title, 'Note': content}
             else:
                 raise Exception('Not enough note data was provided')
             res = self.client.update_request('/note', data, token=self.user.get_token())
@@ -111,7 +108,7 @@ class Controller(BaseController, AuthController):
     # Auth
     def login(self, email: str, password: str):
         try:
-            res = self.client.get_request('/login', email, password)
+            res = self.client.get_request('/login', email, password).json()
             self.user = User(res['User_id'], res['Username'], res['Email'])
             self.user.set_token(res['token'])
             self.user.login()
@@ -130,22 +127,45 @@ class Controller(BaseController, AuthController):
             return True, 'User logged in.'
 
     def logout(self):
-        self.notes.delete_note_by_user_id(self.user.get_user_id())
+        user_id = self.user.get_user_id()
         self.user.logout()
         self.user = None
+        self.notes.delete_note_by_user_id(user_id)
 
     def verify_token(self):
         if self.user.get_token() is None:
             raise Exception("No user is logged in")
 
     # Client side operations
+    def display_user_info(self):
+        print(f'User: {self.user.get_name()} \n User_id: {self.user.get_user_id()} \n Email: {self.user.get_email()} \n ')
+
+    def edit_user_by_id(self):
+        print('Change username or press enter to keep the same one: \n')
+        username = input(f'Username: {self.user.get_name()}\n')
+        if username == '':
+            username = self.user.get_name()
+        print('Choose a new email or press enter to keep the same one: \n')
+        email = input(f'Email: {self.user.get_email()}\n')
+        if email == '':
+            email = self.user.get_email()
+        print('Choose a new password or type the same one to keep it: \n')
+        password = input('Password: \n')
+        while password == '':
+            password = input('Password cannot be empty \n')
+        result = self.update_user(username, email, password)
+        if result[0]:
+            print(result[1])
+        else:
+            print('User info was not updated')
+
     def update_note_list(self):
-        result = self.get_notes(self.user.get_user_id())
+        result = self.get_notes(user_id=self.user.get_user_id())
         if result[0]:
             self.notes.delete_note_by_user_id(self.user.get_user_id())
-            notes = result[1]
+            notes = result[1]['Notes']
             for note in notes:
-                new_note = Note(note_id=note[0], user_id=note[1], title=note[2], content=note[3])
+                new_note = Note(note['Note_id'], note['User_id'], note['Title'], note['Note'])
                 self.notes.add_note(new_note)
 
     def display_notes(self):
@@ -165,6 +185,8 @@ class Controller(BaseController, AuthController):
 
     def edit_note_by_id(self, note_id):
         n = self.notes.get_note_by_id(note_id)
+        if n is None:
+            return print('Note not found')
         print('Change content or press enter to keep the same: \n')
         content = input(f'{n.title}: {n.content}\n')
         if content == '':
@@ -174,7 +196,7 @@ class Controller(BaseController, AuthController):
         if title == '':
             title = n.title
         if self.notes.edit_note(note_id, title, content):
-            result = self.notes.edit_note(note_id, title, content)
+            result = self.update_note(note_id, title, content)
             if result[0]:
                 print(result[1])
             else:
@@ -192,6 +214,7 @@ class Controller(BaseController, AuthController):
         n = Note(None, self.user.get_user_id(), title, content)
         self.notes.add_note(n)
         result = self.add_note(n.user_id, n.title, n.content)
+        self.update_note_list()
         if result[0]:
             print(result[1])
         else:
@@ -199,7 +222,7 @@ class Controller(BaseController, AuthController):
 
     def delete_note_by_id(self, note_id):
         if self.notes.delete_note_by_id(note_id):
-            result = self.notes.delete_note_by_id(note_id)
+            result = self.delete_note(note_id)
             if result[0]:
                 print(result[1])
             else:
@@ -220,28 +243,28 @@ class Controller(BaseController, AuthController):
         with open('Client/Storage/user.json') as user_file:
             user_data = user_file.read()
             for user in json.loads(user_data):
-                if user['email'] == email:
-                    self.user = User(user['User_id'], user['username'], user['email'])
+                if user['Email'] == email:
+                    self.user = User(user['User_id'], user['Username'], user['Email'])
                     self.user.set_token(user['Token'])
                     return True
             return False
 
     def recover_data(self):
         user_id = self.user.get_user_id()
-        db_notes = self.get_notes(user_id, None)[1]
+        db_notes = self.get_notes(user_id, None)[1]['Notes']
         notes = self.notes.get_note_by_user_id(user_id)
         if input('Do you want to remove database notes not present in local storage? (y/n): \n') == 'y':
             print('Removing notes...')
             for note in db_notes:
-                if note[0] not in notes:
-                    self.delete_note(note[0])
-            db_notes = self.get_notes(user_id, None)[1]
+                if note not in notes:
+                    self.delete_note(note['Note_id'])
+            db_notes = self.get_notes(user_id, None)[1]['Notes']
         if input('Do you want to add notes not present in database? (y/n): \n') == 'y':
             print('Adding notes...')
             for note in notes:
                 if note['Note_id'] is None:
                     self.add_note(user_id=user_id, title=note['Title'], content=note['Note'])
-            db_notes = self.get_notes(user_id, None)[1]
+            db_notes = self.get_notes(user_id, None)[1]['Notes']
         if input('Do you want to update notes in database? (y/n): \n') == 'y':
             print('Update notes...')
             count = 0

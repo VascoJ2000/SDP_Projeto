@@ -1,6 +1,6 @@
 class Note:
-    def __init__(self, note_id, user_id, title, content):
-        self.note_id = note_id
-        self.user_id = user_id
-        self.title = title
-        self.content = content
+    def __init__(self, Note_id, User_id, Title, Note):
+        self.note_id = Note_id
+        self.user_id = User_id
+        self.title = Title
+        self.content = Note
