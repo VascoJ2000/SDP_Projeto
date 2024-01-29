@@ -16,7 +16,7 @@ class NoteList:
             return []
 
     def save_notes(self):
-        notes = [{'Note_id': note.note_id, 'User_id': note.user_id,'Title': note.title, 'Note': note.content} for note in self.note_list]
+        notes = [{'Note_id': note.note_id, 'User_id': note.user_id, 'Title': note.title, 'Note': note.content} for note in self.note_list]
 
         with open(self.storage, 'w') as file:
             json.dump(notes, file, indent=2)
@@ -65,10 +65,5 @@ class NoteList:
         return False
 
     def delete_note_by_user_id(self, user_id):
-        if self.get_note_by_user_id(user_id) is None:
-            return False
-        for note in self.note_list:
-            if note.user_id == user_id:
-                self.note_list.remove(note)
+        self.note_list = [note for note in self.note_list if note.user_id != user_id]
         self.save_notes()
-        return True
