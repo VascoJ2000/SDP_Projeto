@@ -65,7 +65,7 @@ class NoteList:
         return False
 
     def delete_note_by_user_id(self, user_id):
-        if not self.get_note_by_user_id(user_id):
+        if self.get_note_by_user_id(user_id) is None:
             return False
         for note in self.note_list:
             if note.user_id == user_id:
