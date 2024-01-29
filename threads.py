@@ -14,8 +14,8 @@ def run_thread(num_bl_servers, num_db_servers):
     server_list = []
 
     # Load Balancers
-    thread1 = Thread(target=LoadBalancer, args=(os.getenv('DB_LOAD_BALANCER_IP'),))
-    thread2 = Thread(target=LoadBalancer, args=(os.getenv('BL_LOAD_BALANCER_IP'),))
+    thread1 = Thread(target=LoadBalancer, args=(os.getenv('DB_LOAD_BALANCER_PORT'),))
+    thread2 = Thread(target=LoadBalancer, args=(os.getenv('BL_LOAD_BALANCER_PORT'),))
 
     server_list.append([thread1, thread2])
 

@@ -9,7 +9,7 @@ load_dotenv()
 class Client:
     def __init__(self):
         self.controller = Controller()
-        self.controller.client.connect('localhost', os.getenv('BL_LOAD_BALANCER_IP'))
+        self.controller.client.connect(os.getenv('BL_LOAD_BALANCER_IP'), os.getenv('BL_LOAD_BALANCER_PORT'))
 
     def run_client(self):
         if self.controller.check_status():

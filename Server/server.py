@@ -8,8 +8,8 @@ class BusinessLayerServer(Server):
     def __init__(self):
         self.controller = Controller()
         super().__init__()
-        self.connect_to_balancer('localhost', os.getenv('BL_LOAD_BALANCER_IP'))
-        self.controller.client.connect('localhost', os.getenv('DB_LOAD_BALANCER_IP'))
+        self.connect_to_balancer(os.getenv('BL_LOAD_BALANCER_IP'), os.getenv('BL_LOAD_BALANCER_PORT'))
+        self.controller.client.connect(os.getenv('DB_LOAD_BALANCER_IP'), os.getenv('DB_LOAD_BALANCER_PORT'))
         self.run_server()
 
     def setup_routes(self):
