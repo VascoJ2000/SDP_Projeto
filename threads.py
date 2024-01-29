@@ -22,7 +22,7 @@ def run_thread(num_bl_servers, num_db_servers):
     thread1.start()
     thread2.start()
 
-    time.sleep(2)
+    time.sleep(3)
 
     # Data Layer Servers
     data_layer_list = []
@@ -30,7 +30,7 @@ def run_thread(num_bl_servers, num_db_servers):
         thread = Thread(target=DLServer)
         data_layer_list.append(thread)
         thread.start()
-        time.sleep(2)
+        time.sleep(3)
 
     server_list.append(data_layer_list)
 
@@ -40,7 +40,7 @@ def run_thread(num_bl_servers, num_db_servers):
         thread = Thread(target=BLServer)
         business_layer_list.append(thread)
         thread.start()
-        time.sleep(2)
+        time.sleep(3)
 
     server_list.append(business_layer_list)
 

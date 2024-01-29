@@ -1,7 +1,13 @@
 from Shared import Client
 from Shared.Abstract import BaseController, AuthController
 from Client.Storage import User, NoteList, Note
+from dotenv import load_dotenv
+from cryptography.fernet import Fernet
 import json
+import os
+
+load_dotenv()
+crypt_key = Fernet(os.getenv('CRYPT_KEY'))
 
 
 class Controller(BaseController, AuthController):
@@ -286,3 +292,13 @@ class Controller(BaseController, AuthController):
             print(f'Updated {count} notes')
         print('Normalizing data...')
         self.update_note_list()
+
+
+def encrypt_notes(note):
+    hashed_note = crypt_key.encrypt(note.encode('utf-8'))
+    return hashed_note.decode('utf-8')
+
+
+def decrypt_notes(hashed_note):
+    note = crypt_key.decrypt(hashed_note.encode('utf-8'))
+    return note.decode('utf-8')
