@@ -166,13 +166,16 @@ class Controller(BaseController, AuthController):
             print('User info was not updated')
 
     def update_note_list(self):
-        result = self.get_notes(user_id=self.user.get_user_id())
+        user_id = self.user.get_user_id()
+        result = self.get_notes(user_id=user_id)
         if result[0]:
-            self.notes.delete_note_by_user_id(self.user.get_user_id())
+            self.notes.delete_note_by_user_id(user_id)
             notes = result[1]['Notes']
             for note in notes:
                 new_note = Note(note['Note_id'], note['User_id'], note['Title'], note['Note'])
                 self.notes.add_note(new_note)
+            return True
+        return False
 
     def display_notes(self):
         notes = self.notes.get_note_by_user_id(self.user.get_user_id())
