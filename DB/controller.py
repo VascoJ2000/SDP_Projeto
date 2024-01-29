@@ -1,12 +1,16 @@
 from DB.db import DLS
 from Shared.Abstract import BaseController
 from flask import request, jsonify
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 
 class Controller(BaseController):
     def __init__(self):
         super().__init__()
-        self.db = DLS("localhost", "3306", "root", "root", "notlar")
+        self.db = DLS(os.getenv('DB_HOST'), os.getenv('DB_PORT'), os.getenv('DB_USER'), os.getenv('DB_PASSWORD'), os.getenv('DB_NAME'))
 
     # User methods
     def get_user(self, user_id, email):
