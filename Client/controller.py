@@ -1,7 +1,13 @@
 from Shared import Client
 from Shared.Abstract import BaseController, AuthController
 from Client.Storage import User, NoteList, Note
+from dotenv import load_dotenv
+from cryptography.fernet import Fernet
 import json
+import os
+
+load_dotenv()
+crypt_key = Fernet(os.getenv('CRYPT_KEY'))
 
 
 class Controller(BaseController, AuthController):
@@ -175,12 +181,9 @@ class Controller(BaseController, AuthController):
 
     def display_note_by_id(self, note_id):
         n = self.notes.get_note_by_id(note_id)
-        print(f'Title: {n.title}')
-        return n
-
-    def display_note_by_title(self, title):
-        n = self.notes.get_note_by_title(title)
-        print(f'Title: {n.title}')
+        print(f'Title: {n.title} \n')
+        n_content = decrypt_notes(n.content)
+        print(f'Note: {n_content} \n')
         return n
 
     def edit_note_by_id(self, note_id):
@@ -188,9 +191,11 @@ class Controller(BaseController, AuthController):
         if n is None:
             return print('Note not found')
         print('Change content or press enter to keep the same: \n')
-        content = input(f'{n.title}: {n.content}\n')
+        n_content = decrypt_notes(n.content)
+        content = input(f'{n.title}: {n_content}\n')
         if content == '':
             content = n.content
+        content = encrypt_notes(content)
         print('Choose a new title or press enter to keep the same: \n')
         title = input('Title: ' + n.title)
         if title == '':
@@ -208,6 +213,7 @@ class Controller(BaseController, AuthController):
         content = input('Write a new note: \n')
         while content == '':
             content = input('Note content cannot be blank \n')
+        content = encrypt_notes(content)
         title = input('Give the note a title \n')
         while title == '':
             title = input('Note title cannot be blank \n')
@@ -286,3 +292,13 @@ class Controller(BaseController, AuthController):
             print(f'Updated {count} notes')
         print('Normalizing data...')
         self.update_note_list()
+
+
+def encrypt_notes(note):
+    hashed_note = crypt_key.encrypt(note.encode('utf-8'))
+    return hashed_note.decode('utf-8')
+
+
+def decrypt_notes(hashed_note):
+    note = crypt_key.decrypt(hashed_note.encode('utf-8'))
+    return note.decode('utf-8')
